@@ -1,5 +1,7 @@
 {
   "files.associations": {
-    "cstdio": "c"
+    "cstdio": "c",
+    "winsock2.h": "c",
+    "windows.h": "c"
   }
 }
