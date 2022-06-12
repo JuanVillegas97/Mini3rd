@@ -26,35 +26,6 @@ typedef FILE *file;
 // Global variables declaration
 char buffer[BUFFER_SIZE];
 
-/* #define NTHREADS 4 */
-
-/* struct _ThreadArgs
-{
-  int tid;
-  int sleepTime;
-};
-
-void *myFun(void *x)
-{
-  struct _ThreadArgs args;
-  int tid, sleepTime;
-  int sum = 0;
-  args = *((struct _ThreadArgs *) x);
-  tid = args.tid;
-  sleepTime = args.sleepTime;
-#ifdef _WIN32
-Sleep(sleepTime * 1000);
-#else
-sleep(sleepTime);
-#endif
-  printf("Woke up %d after seconds %d\n", tid, sleepTime);
-  //Row sum and print
-  for(int i = 0; i < NTHREADS; i++){
-  }
-  printf("The sum of row: %d is: %d\n", tid, sum);
-  return NULL;
-} */
-
 int main(int argc, char *argv[])
 {
   WSADATA wsa;
@@ -94,71 +65,51 @@ int main(int argc, char *argv[])
   }
 
   puts("Bound");
-
   listen(s, 3);
-
   puts("Waiting for connections...");
-  /* 	pthread_t threads[NTHREADS]; */
-  /*   	struct _ThreadArgs thread_args[NTHREADS]; */
-  int rc, i;
 
   c = sizeof(struct sockaddr_in);
-  //! HERE IS WHERE I RECIVE THE STRINGS
+
+  //! HERE IS WHERE I RECIVING
   while ((new_socket = accept(s, (struct sockaddr *)&client, &c)) != INVALID_SOCKET)
   {
     puts("Connection accepted");
-    // if ((recv_size = recv(new_socket, server_reply, 2000, 0)) == SOCKET_ERROR)
-    // {
-    //   puts("recv failed");
-    // }
-    // server_reply[recv_size] = '\0';
-    // len = atoi(server_reply);
-    // server_replyR = (char *)malloc(len);
-    if ((recv(new_socket, buffer, BUFFER_SIZE, 0)) == SOCKET_ERROR)
+    if ((recv(new_socket, buffer, BUFFER_SIZE, 0)) == SOCKET_ERROR) //! RECIVING SAMPLE
     {
       puts("recv failed");
     }
-    file test = fopen("test.txt", "w");
-    fprintf(test, buffer);
+    file test = fopen("sample_1.txt", "w");
+    fprintf(test, "%s", buffer);
     fclose(test);
-    // puts("hi");
-    // char hola[20];
-
-    // if ((recv(new_socket, hola, strlen(hola), 0)) == SOCKET_ERROR)
-    // {
-    //   puts("recv failed");
-    // }
-
-    // puts(hola);
-
-    // if ((recv_size = recv(new_socket, server_reply, 2000, 0)) == SOCKET_ERROR)
-    // {
-    //  puts("recv failed");
-    // }
-    // server_reply[recv_size] = '\0';
-    // nSequences = atoi(server_reply);
-    // for (int i = 0; i < nSequences; i++)
-    // {
-    /* 			if((recv_size = recv(new_socket, server_replySQ, 2000, 0)) == SOCKET_ERROR){
+    //!----------------------------------------------------------------------
+    //!----------------------------------------------------------------------
+    if ((recv(new_socket, buffer, BUFFER_SIZE, 0)) == SOCKET_ERROR) //! RECIVING NUM OF SEQUENCES
+    {
+      puts("recv failed");
+    }
+    int numSquences = atoi(buffer);
+    printf("numSeq server: %d\n", numSquences);
+    //! Receiving sequences
+    //!----------------------------------------------------------------------
+    file test_1 = fopen("sequences_1.txt", "a");
+    for (int i = 0; i < numSquences; i++)
+    {
+      printf("entered for @%d\n", i);
+      if (recv(new_socket, buffer, BUFFER_SIZE, 0) == SOCKET_ERROR)
+      {
         puts("recv failed");
-       }
-       server_replySQ[recv_size] = '\0';
-       strcpy(sequences[cont], server_replySQ);
-       if(i == 300){
-        puts(sequences[i]);
-       }
-       if(cont == 3){
-        cont = 0;
-        memset(sequences[0], '\0', strlen(sequences[0]));
-        memset(sequences[1], '\0', strlen(sequences[1]));
-        memset(sequences[2], '\0', strlen(sequences[2]));
-        memset(sequences[3], '\0', strlen(sequences[3]));
-       }else{
-        cont++;
-       } */
-    // }
+      }
+      fputs(buffer, test_1);
+      printf("seq %d received\n", i);
+    }
+    //!----------------------------------------------------------------------
     message = "Hello socket\n";
     send(new_socket, message, strlen(message), 0);
+
+    /* 	pthread_t threads[NTHREADS]; */
+    /*   	struct _ThreadArgs thread_args[NTHREADS]; */
+    int rc, i;
+
   }
 
   if (new_socket == INVALID_SOCKET)
