@@ -92,7 +92,8 @@ int main(int argc, char *argv[])
  //!----------------------------------------------------------------------
     int i = 0;
     char* posSeq = (char*)malloc(sizeof(int));
-    int cursorSeq = 0;
+    long cursorSeq = 0;
+    int bytes_send=0;
     // read sequences file line by line
     // rewrite each line in buffer every time
     while (fgets(buffer, BUFFER_SIZE, sequences))
@@ -107,15 +108,18 @@ int main(int argc, char *argv[])
         }
 
         // save pos of cursor for end of previous line
-        sprintf(posSeq, "%d", cursorSeq);
+        sprintf(posSeq, "%ld", cursorSeq);
 
-        if (send(s, posSeq, sizeof(int), 0) < 0) //! SENDING POS OF SEQUENCE IN FILE IN MEMORY
+        bytes_send = send(s, posSeq, 8, 0);
+        if (bytes_send < 0) //! SENDING POS OF SEQUENCE IN FILE IN MEMORY
         {
             puts("Send failed");
             return 1;
         }else{
+            printf("posSeq: %s\n", posSeq);
             puts("pos Send succeeded");
         }
+        printf("bytes_send: %d\n", bytes_send);
 
         //save cursor at end of sequence to save pos of next line in next while iteration
         cursorSeq = ftell(sequences);

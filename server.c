@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
   int c, recv_size, len, nSequences, sizes[4], cont = 0;
   char *message, *posStr, server_reply[2000], *server_replyR, seq[20000], server_replySQ[19000], sequences[4][19000];
 
-  posStr = (char*)malloc(sizeof(int));
+  posStr = (char*)malloc(sizeof(long));
 
   // Initializes the library
   if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     }
     int numSequences = atoi(buffer);
     printf("numSeq server: %d\n", numSequences);
-    int posSequences[numSequences]; //array for pointers to the start of each sequence in file
+    long posSequences[numSequences]; //array for pointers to the start of each sequence in file
     //! Receiving sequences
     //!----------------------------------------------------------------------
     file seq1_file = fopen("sequences_1.txt", "a");
@@ -165,14 +165,15 @@ int main(int argc, char *argv[])
         puts("recv failed");
       }
       //receive sequence's address(position) in file
-      if (recv(new_socket, posStr, sizeof(int), 0) == SOCKET_ERROR)
+      if (recv(new_socket, posStr, 8, 0) == SOCKET_ERROR)
       {
         puts("recv failed");
       }
-
+      printf("posStr: %s\n", posStr);
       fputs(buffer, seq1_file);
-      posSequences[i] = atoi(posStr);
+      posSequences[i] = atol(posStr);
       printf("seq %d received\n", i);
+      //printf("posSeq: %ld\n", posSequences[i]);
 
     }
     //!----------------------------------------------------------------------
