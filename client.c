@@ -91,6 +91,10 @@ int main(int argc, char *argv[])
     sequences = fopen("sequences.txt", "r");
  //!----------------------------------------------------------------------
     int i = 0;
+    char* posSeq = (char*)malloc(sizeof(int));
+    int cursorSeq = 0;
+    // read sequences file line by line
+    // rewrite each line in buffer every time
     while (fgets(buffer, BUFFER_SIZE, sequences))
     {
         printf("entered while @%d\n", i++);
@@ -99,16 +103,24 @@ int main(int argc, char *argv[])
             puts("Send failed");
             return 1;
         }else{
-            puts("Send succeeded");
+            puts("seq Send succeeded");
         }
+
+        // save pos of cursor for end of previous line
+        sprintf(posSeq, "%d", cursorSeq);
+
+        if (send(s, posSeq, sizeof(int), 0) < 0) //! SENDING POS OF SEQUENCE IN FILE IN MEMORY
+        {
+            puts("Send failed");
+            return 1;
+        }else{
+            puts("pos Send succeeded");
+        }
+
+        //save cursor at end of sequence to save pos of next line in next while iteration
+        cursorSeq = ftell(sequences);
     }
 
-    if ((recv_size = recv(s, server_reply, 2000, 0)) == SOCKET_ERROR)
-    {
-    puts("recv failed");
-    }
-
-    puts("Reply received\n");
 
     // Add a NULL terminating character to make it a proper string before printing
     server_reply[recv_size] = '\0';
